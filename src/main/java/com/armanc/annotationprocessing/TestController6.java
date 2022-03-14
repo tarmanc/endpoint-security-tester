@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/asd/test6")
 public class TestController6 {
     @GetMapping("/test")
+    @PreAuthorize("hasAuthority('saad')")
     public ResponseEntity<String> test() {
         return ResponseEntity.ok("Success!");
     }
 
     @GetMapping("/public/test2")
-    @PreAuthorize("hasAuthority('saad')")
     public ResponseEntity<String> test2() {
         return ResponseEntity.ok("Success!");
     }

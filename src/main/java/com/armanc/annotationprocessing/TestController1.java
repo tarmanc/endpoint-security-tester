@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/public/test1")
+@RequestMapping("/api/test1")
 @PreAuthorize("hasAuthority('asd')")
 public class TestController1 {
 

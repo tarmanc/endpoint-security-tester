@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController2 {
 
     @GetMapping("/test")
-    @PreAuthorize("hasAuthority('asd')")
     public ResponseEntity<String> test() {
         return ResponseEntity.ok("Success!");
     }

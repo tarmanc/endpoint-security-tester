@@ -48,7 +48,7 @@ public class SecurityTest {
             if (!secureClass) {
                 for (Method m : declaredMethods) {
                     if (isMethodSecure(m)) {
-                        message = String.format("Class: %s has a public method: %s with @PreAuthorized annotation", className, m.getName());
+                        message = String.format("Public Class: %s has a method: %s with @PreAuthorized annotation", className, m.getName());
                         apiSecure = false;
                         break;
                     }
