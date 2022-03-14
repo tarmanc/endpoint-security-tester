@@ -132,16 +132,22 @@ public class SecurityTest {
         return isPathPublic || isValuePublic;
     }
 
-    private boolean isClassSecure(Object clazz) {
-        PreAuthorize annotation = clazz.getClass().getAnnotation(PreAuthorize.class);
-        String value = annotation.value();
-        return !StringUtils.isBlank(value);
+    private boolean isMethodSecure(Method method) {
+        if (method.isAnnotationPresent(PreAuthorize.class)) {
+            PreAuthorize annotation = method.getAnnotation(PreAuthorize.class);
+            String value = annotation.value();
+            return !StringUtils.isBlank(value);
+        }
+        return false;
     }
 
-    private boolean isMethodSecure(Method method) {
-        PreAuthorize annotation = method.getAnnotation(PreAuthorize.class);
-        String value = annotation.value();
-        return !StringUtils.isBlank(value);
+    private boolean isClassSecure(Object clazz) {
+        if (clazz.getClass().isAnnotationPresent(PreAuthorize.class)) {
+            PreAuthorize annotation = clazz.getClass().getAnnotation(PreAuthorize.class);
+            String value = annotation.value();
+            return !StringUtils.isBlank(value);
+        }
+        return false;
     }
 
     private Stream<Arguments> getArgs() {
