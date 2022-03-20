@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,23 +23,21 @@ import static org.hamcrest.Matchers.is;
 
 public class SecurityTest {
 
+    private static final String BASE_PACKAGE = "com.armanc.annotationprocessing";
     private final String PUBLIC_KEY = "/public";
 
     @ParameterizedTest(name = "{displayName} - [{index}] {arguments}")
     @MethodSource("getArgs")
     @DisplayName("API Privilege Test")
-    void securityTest(Object clazz) {
+    void securityTest(Class<Controller> clazz) {
         boolean apiSecure = true;
-        String className = clazz.getClass().getName();
-        String typeName = clazz.getClass().getTypeName();
-        String simpleName = clazz.getClass().getSimpleName();
-        Class<? extends Class> aClass = clazz.getClass().getClass();
+        String className = clazz.getName();
         String message = "";
 
-        RequestMapping classAnnotations = clazz.getClass().getAnnotation(RequestMapping.class);
+        RequestMapping classAnnotations = clazz.getAnnotation(RequestMapping.class);
         boolean secureClass = isClassSecure(clazz);
         boolean isAddressPublic = isAddressPublic(classAnnotations);
-        Method[] declaredMethods = clazz.getClass().getDeclaredMethods();
+        Method[] declaredMethods = clazz.getDeclaredMethods();
 
         if (isAddressPublic) {
             if (!secureClass) {
@@ -147,7 +146,7 @@ public class SecurityTest {
     }
 
     private static Stream<Arguments> getArgs() {
-        Reflections reflections = new Reflections("com.armanc.annotationprocessing");
+        Reflections reflections = new Reflections(BASE_PACKAGE);
         Set<Class<?>> annotatedClasses = new HashSet<>();
         annotatedClasses.addAll(reflections.getTypesAnnotatedWith(Controller.class));
         annotatedClasses.addAll(reflections.getTypesAnnotatedWith(RestController.class));
