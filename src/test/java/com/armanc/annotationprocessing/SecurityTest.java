@@ -25,8 +25,8 @@ import static org.hamcrest.Matchers.is;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest
 public class SecurityTest {
-
-    private final String PUBLIC_KEY = "/public";
+    //TODO REGEX ve matches çalışmıyor
+    private final String PUBLIC_KEY = "/public(?![^/])";
 
     @Autowired
     ApplicationContext applicationContext;
@@ -127,8 +127,8 @@ public class SecurityTest {
     }
 
     private boolean isAddressPublic(String[] pathArr, String[] valueArr) {
-        boolean isPathPublic = Arrays.stream(pathArr).anyMatch(s -> s.contains(PUBLIC_KEY));
-        boolean isValuePublic = Arrays.stream(valueArr).anyMatch(s -> s.contains(PUBLIC_KEY));
+        boolean isPathPublic = Arrays.stream(pathArr).anyMatch(s -> s.matches(PUBLIC_KEY));
+        boolean isValuePublic = Arrays.stream(valueArr).anyMatch(s -> s.matches(PUBLIC_KEY));
         return isPathPublic || isValuePublic;
     }
 
