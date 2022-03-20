@@ -11,11 +11,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -136,9 +134,9 @@ public class SecurityTest {
         return false;
     }
 
-    private boolean isClassSecure(Object clazz) {
-        if (clazz.getClass().isAnnotationPresent(PreAuthorize.class)) {
-            PreAuthorize annotation = clazz.getClass().getAnnotation(PreAuthorize.class);
+    private boolean isClassSecure(Class<Controller> clazz) {
+        if (clazz.isAnnotationPresent(PreAuthorize.class)) {
+            PreAuthorize annotation = clazz.getAnnotation(PreAuthorize.class);
             String value = annotation.value();
             return !StringUtils.isBlank(value);
         }
@@ -150,7 +148,9 @@ public class SecurityTest {
         Set<Class<?>> annotatedClasses = new HashSet<>();
         annotatedClasses.addAll(reflections.getTypesAnnotatedWith(Controller.class));
         annotatedClasses.addAll(reflections.getTypesAnnotatedWith(RestController.class));
-
-        return annotatedClasses.stream().map(Arguments::of);
+        List<Class<?>> collect = annotatedClasses.stream()
+                .sorted(Comparator.comparing(Class::getName))
+                .collect(Collectors.toList());
+        return collect.stream().map(Arguments::of);
     }
 }
