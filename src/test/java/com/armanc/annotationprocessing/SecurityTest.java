@@ -2,34 +2,27 @@ package com.armanc.annotationprocessing;
 
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.platform.commons.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.ApplicationContext;
+import org.reflections.Reflections;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@WebMvcTest
 public class SecurityTest {
 
     private final String PUBLIC_KEY = "/public";
-
-    @Autowired
-    ApplicationContext applicationContext;
 
     @ParameterizedTest(name = "{displayName} - [{index}] {arguments}")
     @MethodSource("getArgs")
@@ -37,6 +30,9 @@ public class SecurityTest {
     void securityTest(Object clazz) {
         boolean apiSecure = true;
         String className = clazz.getClass().getName();
+        String typeName = clazz.getClass().getTypeName();
+        String simpleName = clazz.getClass().getSimpleName();
+        Class<? extends Class> aClass = clazz.getClass().getClass();
         String message = "";
 
         RequestMapping classAnnotations = clazz.getClass().getAnnotation(RequestMapping.class);
@@ -150,9 +146,12 @@ public class SecurityTest {
         return false;
     }
 
-    private Stream<Arguments> getArgs() {
-        Map<String, Object> beansWithAnnotation = applicationContext.getBeansWithAnnotation(Controller.class);
-        beansWithAnnotation.remove("basicErrorController");
-        return beansWithAnnotation.values().stream().map(Arguments::of);
+    private static Stream<Arguments> getArgs() {
+        Reflections reflections = new Reflections("com.armanc.annotationprocessing");
+        Set<Class<?>> annotatedClasses = new HashSet<>();
+        annotatedClasses.addAll(reflections.getTypesAnnotatedWith(Controller.class));
+        annotatedClasses.addAll(reflections.getTypesAnnotatedWith(RestController.class));
+
+        return annotatedClasses.stream().map(Arguments::of);
     }
 }
